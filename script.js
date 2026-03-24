@@ -1,38 +1,4 @@
-// 1. LÓGICA DO DESCONTO DE R$ 9,90 (Aparece após 25s ou na saída)
-const TEMPO_ESPERA_SEGUNDOS = 25;
-let popupMostrado = false;
-
-function mostrarDesconto() {
-    if (popupMostrado) return;
-    document.getElementById('exit-popup').classList.remove('hidden');
-    popupMostrado = true;
-}
-
-// Dispara o popup de R$ 9,90 automaticamente após 25 segundos
-setTimeout(mostrarDesconto, TEMPO_ESPERA_SEGUNDOS * 1000);
-
-// Dispara o popup se a pessoa tentar sair antes dos 25 segundos (Desktop)
-document.addEventListener('mouseleave', e => {
-    if(e.clientY < 0) mostrarDesconto();
-});
-
-// Dispara o popup se a pessoa rolar rápido pra cima (Mobile)
-let lastScrollTop = 0;
-window.addEventListener("scroll", () => {
-   let st = window.pageYOffset || document.documentElement.scrollTop;
-   if (st < lastScrollTop - 60 && st < 300) {
-      mostrarDesconto();
-   }
-   lastScrollTop = st <= 0 ? 0 : st; 
-}, { passive: true });
-
-// Botão de fechar o Popup
-document.getElementById('close-popup').addEventListener('click', () => {
-    document.getElementById('exit-popup').classList.add('hidden');
-});
-
-
-// 2. CONTADOR DE DINHEIRO AO VIVO
+// 1. CONTADOR DE DINHEIRO AO VIVO
 let revenue = 42150.00;
 const revenueEl = document.getElementById('revenue-counter');
 
@@ -45,7 +11,7 @@ setInterval(() => {
 }, 3500);
 
 
-// 3. VAGAS DIMINUINDO
+// 2. VAGAS DIMINUINDO
 let vagas = 14;
 const vagasEl = document.getElementById('vagas-restantes');
 setInterval(() => {
@@ -58,7 +24,7 @@ setInterval(() => {
 }, 12000);
 
 
-// 4. NOTIFICAÇÕES FAKE DE VENDAS
+// 3. NOTIFICAÇÕES FAKE DE VENDAS
 const nomes = ["Ana P.", "Marcos S.", "João V.", "Carla M.", "Felipe R.", "Juliana T."];
 const notification = document.getElementById('sales-notification');
 
@@ -69,3 +35,33 @@ setInterval(() => {
     notification.classList.remove('hidden');
     setTimeout(() => notification.classList.add('hidden'), 4000);
 }, 16000);
+
+
+// 4. POPUP DE URGÊNCIA (Aparece apenas na intenção de saída)
+let popupMostrado = false;
+
+function mostrarAlertaSaida() {
+    if (popupMostrado) return;
+    document.getElementById('exit-popup').classList.remove('hidden');
+    popupMostrado = true;
+}
+
+// Dispara o popup se a pessoa tentar sair (Desktop - Mouse sai da tela por cima)
+document.addEventListener('mouseleave', e => {
+    if(e.clientY < 0) mostrarAlertaSaida();
+});
+
+// Dispara o popup se a pessoa rolar rápido pra cima (Mobile)
+let lastScrollTop = 0;
+window.addEventListener("scroll", () => {
+   let st = window.pageYOffset || document.documentElement.scrollTop;
+   if (st < lastScrollTop - 60 && st < 300) {
+      mostrarAlertaSaida();
+   }
+   lastScrollTop = st <= 0 ? 0 : st; 
+}, { passive: true });
+
+// Botão de fechar o Popup
+document.getElementById('close-popup').addEventListener('click', () => {
+    document.getElementById('exit-popup').classList.add('hidden');
+});
