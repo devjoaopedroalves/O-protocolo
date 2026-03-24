@@ -1,21 +1,35 @@
-// 1. LÓGICA DO PITCH DELAY (Esconder a oferta por 25 segundos)
+// 1. LÓGICA DO DESCONTO DE R$ 9,90 (Aparece após 25s ou na saída)
 const TEMPO_ESPERA_SEGUNDOS = 25;
-let ofertaRevelada = false;
+let popupMostrado = false;
 
-function revelarOferta() {
-    if (ofertaRevelada) return;
-    ofertaRevelada = true;
-    
-    // Pega todos os elementos escondidos e faz eles aparecerem suavemente
-    const elementosEscondidos = document.querySelectorAll('.pitch-hidden');
-    elementosEscondidos.forEach(el => {
-        el.classList.remove('pitch-hidden');
-        el.classList.add('fade-in');
-    });
+function mostrarDesconto() {
+    if (popupMostrado) return;
+    document.getElementById('exit-popup').classList.remove('hidden');
+    popupMostrado = true;
 }
 
-// Inicia o cronômetro assim que a página carrega
-setTimeout(revelarOferta, TEMPO_ESPERA_SEGUNDOS * 1000);
+// Dispara o popup de R$ 9,90 automaticamente após 25 segundos
+setTimeout(mostrarDesconto, TEMPO_ESPERA_SEGUNDOS * 1000);
+
+// Dispara o popup se a pessoa tentar sair antes dos 25 segundos (Desktop)
+document.addEventListener('mouseleave', e => {
+    if(e.clientY < 0) mostrarDesconto();
+});
+
+// Dispara o popup se a pessoa rolar rápido pra cima (Mobile)
+let lastScrollTop = 0;
+window.addEventListener("scroll", () => {
+   let st = window.pageYOffset || document.documentElement.scrollTop;
+   if (st < lastScrollTop - 60 && st < 300) {
+      mostrarDesconto();
+   }
+   lastScrollTop = st <= 0 ? 0 : st; 
+}, { passive: true });
+
+// Botão de fechar o Popup
+document.getElementById('close-popup').addEventListener('click', () => {
+    document.getElementById('exit-popup').classList.add('hidden');
+});
 
 
 // 2. CONTADOR DE DINHEIRO AO VIVO
@@ -35,7 +49,7 @@ setInterval(() => {
 let vagas = 14;
 const vagasEl = document.getElementById('vagas-restantes');
 setInterval(() => {
-    if (vagas > 2 && ofertaRevelada) { // Só diminui vaga se a oferta já apareceu
+    if (vagas > 2) { 
         vagas--;
         vagasEl.innerText = vagas + " Vagas";
         vagasEl.style.opacity = 0;
@@ -44,7 +58,7 @@ setInterval(() => {
 }, 12000);
 
 
-// 4. NOTIFICAÇÕES FAKE
+// 4. NOTIFICAÇÕES FAKE DE VENDAS
 const nomes = ["Ana P.", "Marcos S.", "João V.", "Carla M.", "Felipe R.", "Juliana T."];
 const notification = document.getElementById('sales-notification');
 
@@ -55,35 +69,3 @@ setInterval(() => {
     notification.classList.remove('hidden');
     setTimeout(() => notification.classList.add('hidden'), 4000);
 }, 16000);
-
-
-// 5. POPUP DE SAÍDA E REVELAÇÃO FORÇADA
-let popupMostrado = false;
-
-function acionarSaida() {
-    if (!popupMostrado) {
-        revelarOferta(); // Se a pessoa tentar sair antes dos 25s, revela a oferta na hora
-        document.getElementById('exit-popup').classList.remove('hidden');
-        popupMostrado = true;
-    }
-}
-
-// Desktop: Mouse sai da tela
-document.addEventListener('mouseleave', e => {
-    if(e.clientY < 0) acionarSaida();
-});
-
-// Mobile: Rolagem rápida para cima
-let lastScrollTop = 0;
-window.addEventListener("scroll", () => {
-   let st = window.pageYOffset || document.documentElement.scrollTop;
-   if (st < lastScrollTop - 60 && st < 300) {
-      acionarSaida();
-   }
-   lastScrollTop = st <= 0 ? 0 : st; 
-}, { passive: true });
-
-// Fechar Popup
-document.getElementById('close-popup').addEventListener('click', () => {
-    document.getElementById('exit-popup').classList.add('hidden');
-});
